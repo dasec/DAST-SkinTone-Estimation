@@ -1,0 +1,37 @@
+# Hyperparameters. Identical for the main model, the backbone ablation and the
+# external baseline, so those comparisons isolate the backbone rather than the
+# recipe. Override individual values on the command line.
+
+backbone: vit_small_patch16_224.augreg_in21k_ft_in1k
+img_size: 224
+align: true
+
+batch_size: 32
+epochs: 80
+warmup_epochs: 15
+lr_head: 1.0e-3
+lr_head_phase2: 1.0e-4
+lr_backbone: 1.0e-5
+weight_decay: 1.0e-4
+lr_patience: 8
+lr_factor: 0.5
+early_stop_patience: 20
+channel_weights: [1.0, 1.0, 1.0]
+num_workers: 4
+
+# Subject-wise cross-validation.
+n_folds: 5
+seed: 42
+
+# A CST bin with fewer subjects than this cannot be cross-validated: with two
+# subjects one is in test while the other is in train, so the score measures a
+# single example. Those subjects are pinned to training in every fold instead.
+min_subjects_to_test: 5
+
+# Single-split ratios, used only by the leakage gate in src/data/check_split.py.
+val_ratio: 0.15
+test_ratio: 0.15
+
+# CHROMA-FIT quality filter for the cross-dataset experiments.
+chroma_uqs_min: 40
+chroma_min_L: 20

@@ -1,0 +1,26 @@
+# Exposure-label corrections applied by src/data/build_table.py.
+#
+# Two images in the DAST-10 release carry an exposure label that contradicts
+# their own pixel luminance. Each (subject, camera) group holds six images at
+# fixed EV offsets (-5, -3, 0, +3, +5), so sorting a group by mean luminance
+# must yield E1 < E2 < E3 = E3 < E4 < E5. One group violates this: it contains
+# four E3 and no E4/E5, and the two mislabelled images measure far brighter
+# than that subject's genuine E3 frames, matching the E4 and E5 steps of the
+# same subject on the other camera. Correcting them brings the dataset-wide
+# counts to 320/160/160/160/160, i.e. the intended 4+2+2+2+2 protocol.
+#
+# The corrections are applied in memory; the release files are never modified.
+# They are reported upstream and are part of the published configuration:
+# removing them changes the per-exposure counts and the exposure table in the
+# paper will not reproduce.
+#
+# One further image is flagged but deliberately NOT corrected: its label set is
+# complete and its luminance indicates a capture failure rather than a
+# labelling slip, so no label describes it correctly and it stays as
+# distributed.
+#
+# Format: <image filename>: [<E-level>, <exposure code>]
+
+overrides:
+  "014-I11-E3-Q078.png": ["E4", "oe1"]
+  "014-I12-E3-Q060.png": ["E5", "oe2"]

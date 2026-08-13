@@ -1,0 +1,22 @@
+# Copy to configs/paths.yaml and edit. Nothing here is read until you do.
+# Every script accepts --paths to point at a different file.
+
+# Root of the DAST-10 release (access-restricted, see README).
+dataset_root: /path/to/dast10
+
+# Image metadata and colorimeter ground truth, relative to dataset_root.
+metadata_csv: metadata/file_overview_dast10.csv
+
+# Table holding the CHROMA-FIT rows used by the cross-dataset experiments.
+# Needs the columns CIE-L*/a*/b*, subject_key, mst_bin, complete_path,
+# UnifiedQualityScore.scalar and BackgroundUniformity.scalar.
+chroma_table: /path/to/chroma_fit_table.csv
+
+# Released checkpoint and per-class training images of the external ViT-S/16
+# baseline (Matias et al.). Only needed for the baseline experiments.
+matias_checkpoint: /path/to/matias/checkpoint.pth
+matias_prototype_dir: /path/to/matias/cropped_images_by_class
+
+# Everything written by the pipeline goes here: the built table, checkpoints,
+# predictions and reports.
+work_dir: ./runs

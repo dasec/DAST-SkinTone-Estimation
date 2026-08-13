@@ -1,0 +1,22 @@
+# Local machine configuration.
+configs/paths.yaml
+
+# Everything the pipeline writes: tables, checkpoints, predictions, reports.
+runs/
+*.pth
+*.pt
+*.onnx
+*.csv
+
+# Figures.
+*.png
+*.jpg
+*.jpeg
+*.pdf
+
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+.DS_Store
