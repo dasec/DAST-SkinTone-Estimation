@@ -1,6 +1,6 @@
 # Skin Tone Estimation for Performance Differential Analysis in Biometric Systems
 
-**Authors:** L. Saladino, A. Dörsch, F. Stockhardt, C. Busch
+**Authors:** Luca Saladino, André Dörsch, Fabian Stockhardt, Christoph Busch
 
 ## BIOSIG 2026
 
@@ -14,7 +14,7 @@ Paper: [link to be added](TODO)
 
 A ViT-S/16 regresses continuous CIELAB `L*a*b*` skin tone from ICAO-compliant
 face images, supervised by contact colorimeter measurements. Each prediction is
-then assigned to the skin tone scale of Cook et al. (2025) (CST) by nearest
+then assigned to the skin tone scale of Cook et al. (2024) (CST) by nearest
 centroid in full CIELAB.
 
 | Path | Content |
