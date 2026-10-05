@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
-#
 # Experiment 1, backbone ablation: six backbones, aligned and unaligned, five
-# folds each. The ViT-S/16 aligned cell is reused from the main cross-validation
-# run rather than retrained, so 55 trainings remain.
-#
-#     ./scripts/run_cv_ablation.sh
-#
-# Ordered cheapest first. Resumable: ./scripts/run_cv_ablation.sh <stamp>
-# collect_cv_ablation is safe to run mid-flight; incomplete cells show as PARTIAL.
+# folds each. The ViT-S/16 aligned cell is reused from the main run, which
+# leaves 55 trainings, ordered cheapest first.
+# Resumable: ./scripts/run_cv_ablation.sh <stamp>
 
 set -uo pipefail
 
@@ -53,7 +48,7 @@ step() {
         touch "$marker"
         echo "  [ok]   $name  ($(( (SECONDS-t0)/60 )) min)"
     else
-        echo "  [FAIL] $name  ($(( (SECONDS-t0)/60 )) min) — see $log"
+        echo "  [FAIL] $name  ($(( (SECONDS-t0)/60 )) min), see $log"
         tail -n 12 "$log" | sed 's/^/      | /'
     fi
 }
@@ -96,7 +91,7 @@ for entry in "${CELLS[@]}"; do
         done
     fi
 
-    # refresh the pooled table after every backbone, so a partial run is usable
+    # Refreshed after every backbone, so a partial run is usable.
     python -m src.eval.collect_cv_ablation > "$LOGDIR/ablation_table.log" 2>&1 || true
 done
 

@@ -19,15 +19,14 @@ IMAGENET_STD = [0.229, 0.224, 0.225]
 
 LABEL_COLS = ["CIE-L*", "CIE-a*", "CIE-b*"]
 
-# Rows below this lightness in the second dataset are measurement failures and
-# are always dropped; see the cross-dataset section of the paper.
+# Second-dataset rows below this lightness are measurement failures.
 CHROMA_MIN_L = 20
 
 
 def get_train_transform(img_size=224):
     """Geometry and optical augmentation only."""
-    # No colour jitter: the labels are the image colours, so perturbing colour
-    # would break the input-label relationship.
+    # No colour jitter: the labels are colours, so perturbing colour would break
+    # the input-label relationship.
     return T.Compose([
         T.Resize((img_size, img_size)),
         T.RandomHorizontalFlip(p=0.5),
@@ -39,7 +38,6 @@ def get_train_transform(img_size=224):
 
 
 def get_val_transform(img_size=224):
-    """Resize and normalise, no augmentation."""
     return T.Compose([
         T.Resize((img_size, img_size)),
         T.ToTensor(),
@@ -51,9 +49,8 @@ def make_splits(csv_path, val_ratio=0.15, test_ratio=0.15, seed=42, verbose=True
                 dataset_filter=None, uqs_min=None):
     """Subject-level stratified split; returns (train_df, val_df, test_df).
 
-    dataset_filter keeps only rows of one dataset; uqs_min drops second-dataset
-    rows below that quality score or with an invalid background-uniformity
-    value. Both default to off.
+    uqs_min drops second-dataset rows below that quality score or with an
+    invalid background-uniformity value.
     """
     df = pd.read_csv(csv_path, dtype={"subject_key": str})
 
@@ -78,8 +75,8 @@ def make_splits(csv_path, val_ratio=0.15, test_ratio=0.15, seed=42, verbose=True
             print(f"Quality filter (UQS min={uqs_min}): dropped {before - len(df)} "
                   f"rows, {len(df)} remain")
 
-    # A subject spanning two bins means the table is defective and any split
-    # drawn from it can leak.
+    # A subject spanning two bins makes the table defective: any split drawn
+    # from it can leak.
     spanning = df.groupby("subject_key")["mst_bin"].nunique()
     bad = spanning[spanning > 1]
     if len(bad):
@@ -119,12 +116,39 @@ def make_splits(csv_path, val_ratio=0.15, test_ratio=0.15, seed=42, verbose=True
 
     if verbose:
         print(
-            f"Split — train: {len(train_df)} imgs / {len(train_keys)} subjects"
+            f"Split, train: {len(train_df)} imgs / {len(train_keys)} subjects"
             f" | val: {len(val_df)} imgs / {len(val_keys)} subjects"
             f" | test: {len(test_df)} imgs / {len(test_keys)} subjects"
         )
 
     return train_df, val_df, test_df
+
+
+def make_aligner(ctx_id=0):
+    """InsightFace buffalo_sc detector used for five-point face alignment."""
+    if not _INSIGHTFACE_AVAILABLE:
+        raise ImportError(
+            "insightface required for alignment: pip install insightface"
+        )
+    app = FaceAnalysis(
+        name="buffalo_sc",
+        providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
+    )
+    app.prepare(ctx_id=ctx_id, det_size=(640, 640))
+    return app
+
+
+def align_face(aligner, image):
+    """Return (image, found): the 224x224 aligned crop of the first detected face.
+
+    When no face is detected the image is returned unchanged and found is False.
+    """
+    img_np = np.array(image)
+    faces = aligner.get(img_np)
+    if not faces:
+        return image, False
+    aligned = face_align.norm_crop(img_np, landmark=faces[0].kps, image_size=224)
+    return Image.fromarray(aligned), True
 
 
 class SkinToneDataset(Dataset):
@@ -135,20 +159,9 @@ class SkinToneDataset(Dataset):
         self.transform = transform if transform is not None else get_val_transform()
         self.index = index
         self.aligner = None
-        self._fa = None
 
         if align:
-            if not _INSIGHTFACE_AVAILABLE:
-                raise ImportError(
-                    "insightface required for alignment: pip install insightface"
-                )
-            app = FaceAnalysis(
-                name="buffalo_sc",
-                providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
-            )
-            app.prepare(ctx_id=0, det_size=(640, 640))
-            self.aligner = app
-            self._fa = face_align
+            self.aligner = make_aligner()
 
     def __len__(self):
         return len(self.df)
@@ -162,14 +175,8 @@ class SkinToneDataset(Dataset):
             return None
 
         if self.aligner is not None:
-            img_np = np.array(image)
-            faces = self.aligner.get(img_np)
-            if faces:
-                aligned = self._fa.norm_crop(
-                    img_np, landmark=faces[0].kps, image_size=224
-                )
-                image = Image.fromarray(aligned)
-            # No face detected: keep the original crop.
+            # No face detected: the original image is kept.
+            image, _found = align_face(self.aligner, image)
 
         image = self.transform(image)
         label = torch.tensor(

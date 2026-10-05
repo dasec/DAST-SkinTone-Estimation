@@ -46,13 +46,12 @@ class Paths:
 
 
 def load_paths(path=None):
-    """Read configs/paths.yaml (or `path`) and return a Paths."""
     p = Path(path) if path else DEFAULT_PATHS
     if not p.is_file():
         sys.exit(
             f"missing {p}\n"
             f"copy {CONFIG_DIR / 'paths.example.yaml'} to {DEFAULT_PATHS} "
-            "and set the locations for your machine."
+            "and set the local paths."
         )
     return Paths(yaml.safe_load(p.read_text()))
 
@@ -68,7 +67,6 @@ def load_params(path=None, **overrides):
 
 
 def load_exposure_overrides(path=None):
-    """Read the exposure-label corrections; warn loudly if they are absent."""
     p = Path(path) if path else DEFAULT_OVERRIDES
     data = yaml.safe_load(p.read_text()) if p.is_file() else None
     overrides = (data or {}).get("overrides") or {}
@@ -86,7 +84,6 @@ def load_exposure_overrides(path=None):
 
 
 def add_config_args(parser):
-    """Attach --paths / --params to an argparse parser."""
     parser.add_argument("--paths", default=None, help="path to a paths.yaml")
     parser.add_argument("--params", default=None, help="path to a params yaml")
     return parser

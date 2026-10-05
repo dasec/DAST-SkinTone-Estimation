@@ -1,10 +1,4 @@
-"""Pixel-based baseline: the `stone` CLI with a palette built from the CST centroids.
-
-`stone` does no training, so scoring the cross-validated image set once is the
-CV-equivalent number and is directly comparable with the pooled model figures.
-
-    python -m src.baselines.run_stone_baseline --cv
-"""
+"""Pixel-based baseline: the `stone` CLI with a palette built from the CST centroids."""
 
 import argparse
 import subprocess
@@ -77,11 +71,11 @@ def main():
 
         res = out_dir / "result.csv"
         if not res.is_file():
-            print("      no result.csv — stone failed on this folder")
+            print("      no result.csv: stone failed on this folder")
             continue
 
         df = pd.read_csv(res)
-        # stone can emit several candidate rows per image; keep the most confident
+        # stone can emit several rows per image; the most confident is kept.
         df = df.sort_values("accuracy(0-100)", ascending=False).drop_duplicates("file")
         df["subject_key"] = sid
         df["mst_bin_gt"] = gt_bin
@@ -89,7 +83,7 @@ def main():
                         "accuracy(0-100)"]])
 
     if not rows:
-        sys.exit("stone produced no output at all — check the CLI installation.")
+        sys.exit("stone produced no output at all, check the CLI installation.")
 
     stone_df = pd.concat(rows, ignore_index=True)
     stone_df["predicted_bin"] = stone_df["tone label"].map(LABEL_TO_BIN)

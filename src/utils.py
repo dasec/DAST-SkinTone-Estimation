@@ -4,8 +4,7 @@ import numpy as np
 
 CHANNEL_NAMES = ["L*", "a*", "b*"]
 
-# CST centroids in CIELAB, from Cook et al. (2025), Fig. 4C. Published in that
-# paper and reproduced here as constants; bins are 1-indexed.
+# CST centroids in CIELAB from Cook et al. (2025), Fig. 4C; bins are 1-indexed.
 CST_L = np.array([70.00, 64.44, 58.89, 53.33, 47.78, 42.22, 36.67, 31.11, 25.56, 20.00])
 CST_A = np.array([6.07, 11.02, 14.44, 16.45, 17.20, 16.79, 15.34, 12.93, 9.65, 5.55])
 CST_B = np.array([4.70, 9.26, 13.06, 15.94, 17.74, 18.35, 17.66, 15.62, 12.16, 7.26])
@@ -54,7 +53,6 @@ def compute_metrics(preds: np.ndarray, targets: np.ndarray):
 
 
 def print_metrics(metrics: dict, label: str = None, n: int = None, indent: str = ""):
-    """Print a metrics dict as an aligned block."""
     header = indent
     if label:
         header += label

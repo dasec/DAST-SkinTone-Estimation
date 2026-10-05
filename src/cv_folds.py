@@ -17,10 +17,8 @@ def fold_assignment(csv_path, n_folds=N_FOLDS, seed=SEED,
                     min_subjects_to_test=MIN_SUBJECTS_TO_TEST):
     """Return (assignment, train_only_subjects, df).
 
-    assignment maps a testable subject to its fold index. Subjects in bins with
-    fewer than min_subjects_to_test members are pinned to training in every
-    fold: they contribute to learning but are never scored, because with so few
-    subjects the score would measure whether one example generalises.
+    Subjects in bins with fewer than min_subjects_to_test members train in
+    every fold and are never scored.
     """
     df = pd.read_csv(csv_path, dtype={"subject_key": str})
 
@@ -72,7 +70,6 @@ def make_fold(csv_path, fold, n_folds=N_FOLDS, seed=SEED):
 
 
 def describe(csv_path, n_folds=N_FOLDS, seed=SEED):
-    """Print the fold layout."""
     assignment, train_only, df = fold_assignment(csv_path, n_folds, seed)
     df["_fold"] = df.subject_key.map(assignment)
 

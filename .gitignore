@@ -8,11 +8,21 @@ runs/
 *.onnx
 *.csv
 
-# Figures.
+# Images and figures, wherever the pipeline writes them.
 *.png
 *.jpg
 *.jpeg
 *.pdf
+
+# Exceptions: the demo images and the figures shown in the README are tracked.
+!demo_data/*.jpg
+!figures/*.png
+!figures/*.jpg
+!figures/*.pdf
+
+# Released weights are downloaded into models/ and never committed.
+models/*
+!models/.gitkeep
 
 __pycache__/
 *.py[cod]

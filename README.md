@@ -1,69 +1,114 @@
 # Skin Tone Estimation for Performance Differential Analysis in Biometric Systems
 
-Code for the BIOSIG 2026 paper of the same name.
+**Authors:** L. Saladino, A. Dörsch, F. Stockhardt, C. Busch
 
-The method regresses continuous CIELAB `L*a*b*` skin tone directly from
-ICAO-compliant face images with a ViT-S/16, supervised by contact colorimeter
-measurements rather than by perceptual class labels. Predictions are assigned to
-Cook et al. (2025) skin tone scale (CST) bins by nearest centroid in full
-CIELAB. Regressing the measurement and binning afterwards keeps a continuous,
-device-referenced quantity available for demographic differential analysis,
-which a direct classifier discards. Evaluation is five-fold subject-wise
-cross-validation, so every subject is held out exactly once and the spread
-across folds gives error bars that a single split cannot.
+## BIOSIG 2026
 
-## Datasets
+Code and models of the paper "Skin Tone Estimation for Performance Differential
+Analysis in Biometric Systems", presented at BIOSIG 2026.
 
-**Primary dataset (DAST-10).** Access-restricted and not included here, in whole
-or in part. It holds ICAO-compliant captures at five fixed exposure levels
-(EV offsets −5, −3, 0, +3, +5) on two cameras, with a per-subject face
-colorimeter `L*a*b*` reading and a CST class. Access is governed by a data
-protection agreement and must be requested from the data controller; this
-repository ships no images, no metadata table and no colorimeter values.
+<!-- TODO: replace with the link to the published paper. -->
+Paper: [link to be added](TODO)
 
-**CHROMA-FIT.** Used for the cross-dataset transfer experiment. Obtain it from
-its publishers under their own terms.
+## Overview
 
-**External baseline.** Experiment 5 needs the released checkpoint and the
-per-class training images of the prototype-based ViT-S/16 classifier of
-Matias et al. Request them from that work's authors.
+A ViT-S/16 regresses continuous CIELAB `L*a*b*` skin tone from ICAO-compliant
+face images, supervised by contact colorimeter measurements. Each prediction is
+then assigned to the skin tone scale of Cook et al. (2025) (CST) by nearest
+centroid in full CIELAB.
 
-The pipeline reads its data through `configs/paths.yaml`; nothing is hardcoded.
+| Path | Content |
+|---|---|
+| `src/` | model, dataset, training, cross-validation, baselines, transfer and interpretability code |
+| `src/inference.py` | predicts `L*a*b*` and the CST bin for a folder of images |
+| `analysis/` | error analysis by CST bin and by camera |
+| `scripts/` | drivers for the cross-validation experiments |
+| `configs/` | hyperparameters, path template and exposure-label corrections |
+| `demo_data/` | five images of one subject, one per exposure level |
+| `models/` | empty; the downloaded weights go here |
 
 ## Setup
 
+<!-- TODO: replace with the final repository URL under github.com/dasec. -->
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-
-cp configs/paths.example.yaml configs/paths.yaml
-$EDITOR configs/paths.yaml        # point at your data and choose a work_dir
+git clone https://github.com/dasec/TODO-repository-name.git
+cd TODO-repository-name
+conda env create -f requirements.yaml
+conda activate skintone
 ```
 
-Python 3.9 or newer. A CUDA GPU is assumed; everything falls back to CPU but the
-trainings become impractical. Hyperparameters live in `configs/default.yaml` and
-are shared by the main model, the ablation and the fine-tuned baseline, so those
-comparisons isolate the backbone rather than the recipe.
+On a machine without an NVIDIA GPU, replace `onnxruntime-gpu` with `onnxruntime`
+in `requirements.yaml`.
 
-All commands are run from the repository root and accept `--paths` and
-`--params` to override the config files.
+<!-- TODO: replace with the h-da cloud link. -->
+Download the weights from the [h-da cloud](TODO) into `models/`.
 
-## Data preparation
+## Usage
+
+One model:
 
 ```bash
-python -m src.data.verify_dataset          # integrity gate on the release
-python -m src.data.build_table             # -> <work_dir>/dast10_table.csv
-python -m src.data.check_split             # leakage gate
-python -m src.data.check_exposure_labels   # luminance cross-check of the labels
+python src/inference.py --model models/skintone_vits16_fold3.pth \
+    --input demo_data --output predictions.csv
 ```
 
-`build_table` applies the corrections in `configs/exposure_overrides.yaml`. Two
-images in the release carry an exposure label that contradicts their own
-luminance; without the corrections the per-exposure counts, and every
-per-exposure result, differ from the published table. The loader warns if the
-file is missing or empty.
+```
+image,L*,a*,b*,cst_bin,face_detected,status
+EL1.jpg,54.803,9.7405,14.6874,3,True,ok
+EL2.jpg,54.5665,9.8054,15.0138,3,True,ok
+EL3.jpg,54.9244,9.7615,14.6393,3,True,ok
+EL4.jpg,55.054,9.8452,14.3314,3,True,ok
+EL5.jpg,54.1915,9.8271,14.8138,4,True,ok
+```
 
-## Experiments
+The demo images show subject 001 of DAST-10 at the five exposure levels, from
+strongly underexposed (`EL1`) to strongly overexposed (`EL5`). This subject is
+in the test set of fold 3, so the output above is a held-out prediction. The
+colorimeter reading of the subject is `L*` = 54.5 (Fig. 1 of the paper). Values
+can differ by about 0.01 between machines.
+
+All five models, with their predictions averaged:
+
+```bash
+python src/inference.py --model "models/skintone_vits16_fold*.pth" \
+    --input demo_data --output predictions.csv
+```
+
+The other four models were trained on subject 001, so this second output is not
+a held-out prediction for the demo images.
+
+Images are aligned with InsightFace `buffalo_sc` inside the script. `cst_bin` is
+the nearest CST centroid in full CIELAB by ΔE76, numbered from 1. If no face is
+detected, the whole image is used and the row is marked `face_detected=False`;
+unreadable files get a row without a prediction. Both are listed at the end of
+the run.
+
+## Model Zoo
+
+Five ViT-S/16 models (`vit_small_patch16_224.augreg_in21k_ft_in1k`, 224 × 224
+input, about 87 MB each), one per cross-validation fold.
+
+| File | Held-out fold | MD5 |
+|---|---|---|
+| `skintone_vits16_fold0.pth` | 0 | `4b45955792843ec207641e349ee6a864` |
+| `skintone_vits16_fold1.pth` | 1 | `c674feda1912e9880a7b076df26190d2` |
+| `skintone_vits16_fold2.pth` | 2 | `b76ae3c171f05982ba790b87d1fa1679` |
+| `skintone_vits16_fold3.pth` | 3 | `6f0e6a632bc9dd9d49cd60e74089b73b` |
+| `skintone_vits16_fold4.pth` | 4 | `8ef00e41321fd944690561eeea56d1d7` |
+
+The numbers in the paper come from these models, each scored on its held-out
+fold and pooled: R² of `L*` 0.918, mean ΔE76 3.07, 55.9% exact CST bin and 98.7%
+within one bin. Averaging the models is supported by the script but was not
+evaluated in the paper.
+
+## Reproducing the paper
+
+DAST-10 is governed by a data-protection agreement and is not included; access
+must be requested from the data controller. CHROMA-FIT and the external baseline
+of Matias et al. are obtained from their authors. Copy
+`configs/paths.example.yaml` to `configs/paths.yaml`, set the paths, and run
+`python -m src.data.build_table` before the experiments. All commands run from
+the repository root.
 
 | # | Experiment | Command |
 |---|---|---|
@@ -75,53 +120,35 @@ file is missing or empty.
 | 5 | Pixel baseline | `python -m src.baselines.run_stone_baseline --cv` |
 | 5 | External ViT-S/16 baseline, zero-shot and fine-tuned | `./scripts/run_matias_cv.sh` |
 | 6 | Occlusion sensitivity and EigenCAM | `./scripts/run_cv_transfer.sh` |
+| 7 | Error by CST bin and by camera | `python analysis/camera_ready_error_analysis.py <work_dir>/results/cv_pooled_predictions.csv` |
 
-Experiment 1 must run first: 1b, 4 and 6 reuse its five fold checkpoints rather
-than retraining with a different seed, and refuse to start if they are missing.
-Experiment 4 also needs `python -m src.transfer.build_merged_table`.
-The `run_*.sh` drivers are resumable — rerun with the stamp they print to
-continue after an interruption.
+Experiment 1 runs first; the others reuse its fold checkpoints and predictions.
 
-## Which script produces which number
+## Disclaimer
 
-| Reported quantity | Produced by | Written to |
-|---|---|---|
-| Per-channel MAE / RMSE / R² of `L*`, `a*`, `b*`; ΔE76 | `src.eval.collect_cv` | `results/CV_REPORT.txt` |
-| Per-fold spread (mean, std, min, max) | `src.eval.collect_cv` | `results/CV_REPORT.txt` |
-| Exact match and within-one-bin under the 1D, 2D and 3D rules | `src.eval.collect_cv` | `results/CV_REPORT.txt` |
-| Exact-match ceiling of the 2D rule | `src.eval.ceiling` | stdout |
-| Accuracy and bias per exposure level, and its LaTeX rows | `src.eval.exposure_breakdown` | stdout |
-| Backbone ablation table, including DINOv2 R²(`b*`) | `src.eval.collect_cv_ablation` | `results/CV_ABLATION.txt` |
-| Zero-shot transfer, per fold and the drop in R²(`a*`) | `src.transfer.eval_zeroshot_chroma_cv` | `results/cv_zeroshot_chroma.csv` |
-| Estimated per-channel device offset | `src.transfer.train_crossdataset_cv` | `results/cv_cross/fold*.csv` |
-| Transfer after correction, and the no-shift control | `src.transfer.collect_transfer_interp` | `results/CV_TRANSFER_INTERP.txt` |
-| Pixel baseline accuracy, overall and per exposure level | `src.baselines.run_stone_baseline` | stdout, `results/stone_cst_cv.csv` |
-| External baseline zero-shot vs fine-tuned vs ours | `src.baselines.collect_matias_cv` | `results/MATIAS_CV.txt` |
-| Occlusion sensitivity per region, face/background ratio | `src.interpret.region_sensitivity_cv` | `results/CV_TRANSFER_INTERP.txt` |
-| EigenCAM and occlusion figure | `src.interpret.eigencam_cv` | `results/eigencam_cv*/` |
+The models were evaluated by five-fold subject-wise cross-validation on 80
+DAST-10 subjects, and each fold model was trained on 48 to 50 of them. All
+subjects were captured under ICAO-compliant conditions; behaviour on other kinds
+of images has not been established.
 
-Paths are relative to the `work_dir` set in `configs/paths.yaml`.
+Only CST bins 2 to 9 were evaluated. Bin 1 was never scored, because it has too
+few subjects to be cross-validated, and bin 10 is absent from the dataset.
 
-## Notes on reading the results
+The estimated scale is compressed towards its centre: light skin tones tend to
+be predicted darker than measured and dark skin tones lighter than measured.
 
-**The 2D rule has a ceiling well below 100%.** Ground-truth bins are assigned by
-nearest CST centroid in full CIELAB, but predictions are binned on `L*`+`b*`,
-because `a*` is not reliably predictable from the images. A predictor returning
-the exact colorimeter values would still not reach 100% exact match, and some
-bins are structurally unreachable. Read exact match against the ceiling that
-`src.eval.ceiling` reports, not against 100%.
+The models are research artefacts and are provided without any warranty. The
+code is released under the MIT licence, see `LICENSE`; the licence covers the
+code only, not any dataset.
 
-**Bins with too few subjects are never scored.** A CST bin with fewer subjects
-than `min_subjects_to_test` cannot be cross-validated: with two subjects, one is
-in test while the other is in train, so the score measures whether a single
-example generalises. Those subjects are pinned to the training set of every fold
-instead. This is why the number of scored subjects is smaller than the number of
-subjects in the dataset.
+## Citation
 
-**Trained checkpoints are not distributed.** Neither are prediction files,
-reports or figures. Everything under `work_dir` is produced by running the
-commands above on data you have obtained yourself.
-
-## Licence
-
-MIT, see `LICENSE`. The licence covers this code only, not any dataset.
+```bibtex
+@inproceedings{Saladino-SkinToneEstimation-BIOSIG-2026,
+  Author    = {L. Saladino and A. D{\"o}rsch and F. Stockhardt and C. Busch},
+  Booktitle = {Proc. Intl. Conf. of the Biometrics Special Interest Group ({BIOSIG})},
+  Title     = {Skin Tone Estimation for Performance Differential Analysis in Biometric Systems},
+  Publisher = {IEEE},
+  Year      = {2026}
+}
+```

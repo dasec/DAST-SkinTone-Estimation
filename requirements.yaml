@@ -1,0 +1,32 @@
+# Conda environment with the versions used for the reported results.
+#   conda env create -f requirements.yaml
+#   conda activate skintone
+# Later versions are likely to work. The torch wheels from PyPI bundle their own
+# CUDA runtime and need a recent NVIDIA driver; with an older driver, install the
+# matching build from https://pytorch.org instead (the paper used the CUDA 11.8
+# build of torch 2.5.1). Without a usable GPU everything runs on the CPU.
+name: skintone
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+      - torch==2.5.1
+      - torchvision==0.20.1
+      - timm==1.0.25
+      - numpy==2.0.1
+      - pandas==2.3.3
+      - scipy==1.15.3
+      - Pillow==10.2.0
+      - scikit-image==0.25.2
+      - matplotlib==3.10.8
+      - PyYAML==6.0.3
+      # Face alignment. insightface downloads the buffalo_sc detector at first
+      # use; onnxruntime-gpu can be swapped for onnxruntime on a CPU-only machine.
+      - insightface==0.7.3
+      - onnxruntime-gpu==1.23.2
+      # EigenCAM (experiment 6).
+      - grad-cam==1.5.5
+      # Pixel baseline (experiment 5); provides the `stone` command line tool.
+      - skin-tone-classifier==1.2.6

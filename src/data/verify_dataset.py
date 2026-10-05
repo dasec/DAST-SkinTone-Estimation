@@ -1,7 +1,4 @@
-"""Integrity gate on the dataset release; exits non-zero on the first real problem.
-
-    python -m src.data.verify_dataset
-"""
+"""Integrity gate on the dataset release; exits non-zero on the first real problem."""
 
 import argparse
 import hashlib
@@ -23,7 +20,7 @@ failures = []
 
 
 def check(label, ok, detail=""):
-    print(f"  [{'PASS' if ok else 'FAIL'}] {label}" + (f" — {detail}" if detail else ""))
+    print(f"  [{'PASS' if ok else 'FAIL'}] {label}" + (f": {detail}" if detail else ""))
     if not ok:
         failures.append(label)
 
@@ -58,8 +55,8 @@ def main():
     check("no subject id under two bin folders", not repeated,
           f"{len(repeated)} repeated")
 
-    # Content hash rather than folder name: an earlier distribution shipped the
-    # same subject under two bins, which a name-based check cannot see.
+    # Content hash, not folder name: a subject stored under two bins passes a
+    # name-based check.
     seen, collisions = {}, []
     for p in images:
         h = hashlib.md5(p.read_bytes()).hexdigest()

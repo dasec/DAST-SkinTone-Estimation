@@ -1,11 +1,4 @@
-"""EigenCAM and occlusion maps from a cross-validation fold model.
-
-Subjects are picked from the chosen fold's held-out test set, so the model
-producing the maps never saw them, and they span the tone range present in that
-fold.
-
-    python -m src.interpret.eigencam_cv --fold 0 --subjects 3
-"""
+"""EigenCAM and occlusion maps from a cross-validation fold model."""
 
 import argparse
 import sys

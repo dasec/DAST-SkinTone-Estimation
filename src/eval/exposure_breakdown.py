@@ -1,9 +1,4 @@
-"""Bin accuracy per exposure level over the pooled cross-validation predictions.
-
-Reports the robustness table of the paper, plus its rows in LaTeX form.
-
-    python -m src.eval.exposure_breakdown
-"""
+"""Bin accuracy per exposure level over the pooled cross-validation predictions."""
 
 import argparse
 import sys
@@ -46,7 +41,7 @@ def main():
     paths = load_paths(args.paths)
     pooled = paths.results / "cv_pooled_predictions.csv"
     if not pooled.is_file():
-        sys.exit(f"missing {pooled} — run src.eval.collect_cv first")
+        sys.exit(f"missing {pooled}, run src.eval.collect_cv first")
 
     d = pd.read_csv(pooled, dtype={"subject_key": str})
     print("=" * 74)

@@ -1,10 +1,4 @@
-"""Fine-tune the external baseline backbone on one cross-validation fold.
-
-Same folds, head, hyperparameters and schedule as src/train_cv.py, so the only
-difference from the main model is how the backbone was pretrained.
-
-    python -m src.baselines.train_matias_cv --fold 0 --align
-"""
+"""Fine-tune the external baseline backbone on one cross-validation fold."""
 
 import argparse
 import time
@@ -66,7 +60,7 @@ NUM_WORKERS = P["num_workers"]
 
 
 class MatiasFinetune(nn.Module):
-    """External baseline backbone with our regression head; projection head dropped."""
+    """External baseline backbone with the regression head of the main model; projection head dropped."""
 
     def __init__(self):
         super().__init__()

@@ -1,7 +1,4 @@
-"""Build the training table from the dataset metadata csv.
-
-    python -m src.data.build_table
-"""
+"""Build the training table from the dataset metadata csv."""
 
 import argparse
 import sys
@@ -11,20 +8,18 @@ import pandas as pd
 
 from src.config import add_config_args, load_exposure_overrides, load_paths
 
-# The release encodes exposure as E1-E5 in the filename; EL1-EL5 is the naming
-# used in the paper for the same five levels.
+# E1-E5 in the filenames are the levels EL1-EL5 of the paper.
 EL_FROM_E = {"E1": "EL1", "E2": "EL2", "E3": "EL3", "E4": "EL4", "E5": "EL5"}
 EL_NAME = {"EL1": "strongly underexposed", "EL2": "underexposed",
            "EL3": "normal", "EL4": "overexposed", "EL5": "strongly overexposed"}
 
-# Coarser 3-way vocabulary, kept so per-exposure breakdowns stay comparable.
+# Coarser three-way grouping of the five levels.
 EXPOSURE_3WAY = {"EL1": "under exposed", "EL2": "under exposed", "EL3": "normal",
                  "EL4": "over exposed", "EL5": "over exposed"}
 
 LAB = {"avg L* (face)": "CIE-L*", "avg a* (face)": "CIE-a*", "avg b* (face)": "CIE-b*"}
 
-# Quality-metric names differ between tool versions; map them onto the ".scalar"
-# names the cross-dataset code expects.
+# Quality-metric names differ between tool versions.
 OFIQ_RENAME = {
     "NoCompressionArtifacts": "CompressionArtifacts",
     "LeftwardCropOfFace": "LeftwardCropOfTheFaceImage",

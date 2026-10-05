@@ -1,12 +1,4 @@
-"""Cross-check exposure labels against measured image luminance.
-
-Each (subject, camera) group holds six images at fixed EV offsets, so sorting a
-group by mean luminance must give E1 < E2 < E3 = E3 < E4 < E5. Groups that
-disagree with their own luminance ordering are reported; the corrections that
-follow from this check live in configs/exposure_overrides.yaml.
-
-    python -m src.data.check_exposure_labels
-"""
+"""Cross-check exposure labels against measured image luminance."""
 
 import argparse
 import multiprocessing as mp
@@ -19,6 +11,8 @@ from src.config import add_config_args, load_paths
 
 Image.MAX_IMAGE_PIXELS = None
 
+# Six images per (subject, camera) at fixed EV offsets: sorted by luminance,
+# their labels must read as follows.
 EXPECTED_SORTED = ["E1", "E2", "E3", "E3", "E4", "E5"]
 
 _DATA_ROOT = None
@@ -63,14 +57,14 @@ def main():
     bad_groups = []
     for (sid, cam), g in d.groupby(["sid", "camera"]):
         if len(g) != 6:
-            print(f"  a group has {len(g)} images, not 6 — skipped")
+            print(f"  a group has {len(g)} images, not 6, skipped")
             continue
         order = g.sort_values("luma")
         if list(order.E) != EXPECTED_SORTED:
             bad_groups.append((sid, cam, order))
 
     if not bad_groups:
-        print("  none — every group is consistent")
+        print("  none: every group is consistent")
     for sid, cam, order in bad_groups:
         print(f"\n  group on camera {cam}")
         print(f"    {'labelled':>9} {'luma':>8}  {'implied':>8}")

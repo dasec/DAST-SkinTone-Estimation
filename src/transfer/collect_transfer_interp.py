@@ -1,10 +1,4 @@
-"""Report cross-dataset transfer and occlusion sensitivity under cross-validation.
-
-Each block names the file it was read from. Missing inputs are reported rather
-than skipped silently.
-
-    python -m src.transfer.collect_transfer_interp
-"""
+"""Report cross-dataset transfer and occlusion sensitivity under cross-validation."""
 
 import argparse
 

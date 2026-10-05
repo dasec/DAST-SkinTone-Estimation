@@ -19,13 +19,15 @@ class SkinToneRegressor(nn.Module):
     """Pretrained backbone plus a small MLP head; outputs [L*, a*, b*]."""
 
     def __init__(self, backbone_name="vit_small_patch16_224.augreg_in21k_ft_in1k",
-                 freeze_backbone=True, num_outputs=3):
+                 freeze_backbone=True, num_outputs=3, pretrained=True):
         super().__init__()
-        # Always ImageNet weights: the backbone is retrained here, never warm
-        # started from a previous run of this pipeline.
-        self.backbone = timm.create_model(backbone_name, pretrained=True, num_classes=0)
+        # pretrained=False skips the ImageNet download when a checkpoint is
+        # loaded afterwards.
+        self.backbone = timm.create_model(backbone_name, pretrained=pretrained,
+                                          num_classes=0)
         feat_dim = _get_feat_dim(self.backbone)
-        print(f"Backbone: {backbone_name}  feature_dim={feat_dim}  (ImageNet weights)")
+        if pretrained:
+            print(f"Backbone: {backbone_name}  feature_dim={feat_dim}  (ImageNet weights)")
 
         if freeze_backbone:
             for p in self.backbone.parameters():

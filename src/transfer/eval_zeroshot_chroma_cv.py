@@ -1,11 +1,4 @@
-"""Zero-shot CHROMA-FIT transfer for each cross-validation fold model.
-
-No training happens here. The quality filter is applied once before the loop, so
-every fold sees an identical image set and the spread measures how stable the
-transfer is with respect to the training partition.
-
-    python -m src.transfer.eval_zeroshot_chroma_cv
-"""
+"""Zero-shot CHROMA-FIT transfer for each cross-validation fold model."""
 
 import argparse
 import sys

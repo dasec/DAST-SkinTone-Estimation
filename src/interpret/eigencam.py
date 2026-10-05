@@ -1,10 +1,4 @@
-"""EigenCAM and sliding-window occlusion maps for the ViT regressor.
-
-EigenCAM takes the first principal component of the activations at the
-LayerNorm before the last attention block. Raw attention maps are deliberately
-not used: without register tokens they carry high-magnitude artefacts in
-low-information regions.
-"""
+"""EigenCAM and sliding-window occlusion maps for the ViT regressor."""
 
 import matplotlib
 matplotlib.use("Agg")
@@ -16,6 +10,8 @@ from PIL import Image  # noqa: E402
 from src.dataset import IMAGENET_MEAN, IMAGENET_STD  # noqa: E402
 from src.interpret.occlusion import IMG, TARGET_CH, make_aligner, load_aligned  # noqa: E402,F401
 
+# EigenCAM, not raw attention: without register tokens, attention maps carry
+# high-magnitude artefacts in low-information regions.
 N_PATCH = IMG // 16
 OCC_WINDOW, OCC_STRIDE, OCC_BATCH, OCC_FILL = 24, 8, 128, 0.0
 MEAN = np.array(IMAGENET_MEAN)

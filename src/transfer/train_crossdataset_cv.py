@@ -1,11 +1,4 @@
-"""Combined training on both datasets with the mean-shift correction, one fold.
-
-The primary dataset keeps the exact folds of the main cross-validation, so its
-figures here are on the same subjects as the main experiments. CHROMA-FIT
-subjects are folded separately with the same rotation.
-
-    python -m src.transfer.train_crossdataset_cv --fold 0
-"""
+"""Combined training on both datasets with the mean-shift correction, one fold."""
 
 import argparse
 import time
@@ -106,8 +99,7 @@ def build_split(fold):
 
 def compute_shift(train_df):
     """Per-channel device offset, estimated on the training split only."""
-    # Estimating it over the whole pool would leak test labels into the labels
-    # the model is fitted against.
+    # Estimated over the whole pool, it would leak test labels into training.
     d = train_df[train_df.dataset == "dast"][LABELS].mean()
     c = train_df[train_df.dataset == "chroma"][LABELS].mean()
     shift = d - c

@@ -1,7 +1,4 @@
-"""Train one cross-validation fold and write its held-out test predictions.
-
-    python -m src.train_cv --fold 0 --align
-"""
+"""Train one cross-validation fold and write its held-out test predictions."""
 
 import argparse
 import time
@@ -140,7 +137,7 @@ def main():
           f"test {len(test_df)} / {test_df.subject_key.nunique()}\n")
 
     lm, ls = label_stats(train_df)
-    print(f"label stats (train only) — mean {lm.cpu().numpy().round(2)}  "
+    print(f"label stats (train only): mean {lm.cpu().numpy().round(2)}  "
           f"std {ls.cpu().numpy().round(2)}")
 
     model = SkinToneRegressor(backbone_name=BACKBONE_NAME,
@@ -161,7 +158,7 @@ def main():
         optimizer, mode="min", factor=LR_FACTOR, patience=LR_PATIENCE)
 
     best, no_improve, phase = float("inf"), 0, 1
-    print(f"\nPhase 1 — {WARMUP_EPOCHS} warm-up epochs (backbone frozen)")
+    print(f"\nPhase 1: {WARMUP_EPOCHS} warm-up epochs (backbone frozen)")
 
     for epoch in range(1, EPOCHS + 1):
         if epoch == WARMUP_EPOCHS + 1 and phase == 1:

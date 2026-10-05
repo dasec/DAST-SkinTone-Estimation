@@ -1,12 +1,4 @@
-"""Exact-match ceiling of each bin rule.
-
-Ground-truth bins are assigned by nearest CST centroid in full CIELAB, but
-predictions are binned on L*+b* because a* is not reliably predictable. The two
-criteria disagree on some subjects however good the model is, so exact match
-should be read against this ceiling rather than against 100%.
-
-    python -m src.eval.ceiling
-"""
+"""Exact-match ceiling of each bin rule."""
 
 import argparse
 
@@ -28,6 +20,8 @@ def main():
                              test_ratio=P["test_ratio"], seed=P["seed"],
                              verbose=False)
 
+    # Ground-truth bins use full CIELAB, so a rule on fewer channels cannot
+    # reach 100% exact match even from the exact colorimeter values.
     rules = {
         "L* only (1D)": lambda r: assign_bin_L(r["CIE-L*"]),
         "L* + b* (2D)": lambda r: assign_bin_Lb(r["CIE-L*"], r["CIE-b*"]),

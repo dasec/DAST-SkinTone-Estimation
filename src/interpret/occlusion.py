@@ -1,8 +1,4 @@
-"""Occlusion sensitivity: replace a region with neutral grey, measure the shift in L*.
-
-Needs no gradients, so it measures what the model uses rather than what a
-saliency approximation suggests.
-"""
+"""Occlusion sensitivity: replace a region with neutral grey, measure the shift in L*."""
 
 import numpy as np
 import torch

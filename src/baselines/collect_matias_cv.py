@@ -1,10 +1,4 @@
-"""Pool the fine-tuned baseline folds and put them beside the main model.
-
-Both are pooled over the same images from the same subjects. The zero-shot row
-comes from eval_matias.py --cv, which scores that same image set.
-
-    python -m src.baselines.collect_matias_cv
-"""
+"""Pool the fine-tuned baseline folds and put them beside the main model."""
 
 import argparse
 import sys
@@ -33,7 +27,7 @@ def main():
 
     files = sorted(matias_cv.glob("fold*_test_predictions.csv"))
     if not files:
-        sys.exit(f"no fine-tuned folds in {matias_cv} — run src.baselines.train_matias_cv")
+        sys.exit(f"no fine-tuned folds in {matias_cv}, run src.baselines.train_matias_cv")
     mf = pd.concat([pd.read_csv(f, dtype={"subject_key": str}) for f in files],
                    ignore_index=True)
 
@@ -49,7 +43,7 @@ def main():
     emit(f"baseline (ft): {len(mf)} images / {mf.subject_key.nunique()} subjects")
 
     same = set(ours.subject_key) == set(mf.subject_key) and len(ours) == len(mf)
-    emit(f"same evaluation set: {'yes' if same else 'NO — comparison is invalid'}")
+    emit(f"same evaluation set: {'yes' if same else 'NO, comparison is invalid'}")
 
     rows = []
 
@@ -64,7 +58,7 @@ def main():
         rows.append(("Baseline, zero-shot", len(zs), ex * 100, w1 * 100,
                      np.nan, np.nan))
     else:
-        emit(f"\n  WARNING: {matias_zs} missing — run src.baselines.eval_matias --cv")
+        emit(f"\n  WARNING: {matias_zs} missing, run src.baselines.eval_matias --cv")
 
     for label, d in (("Baseline, fine-tuned", mf), ("Ours", ours)):
         ex, w1 = bin_accuracy(d.mst_gt, d.bin_Lb)

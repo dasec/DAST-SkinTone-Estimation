@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
-#
-# Experiment 1: 5-fold subject-wise cross-validation of the main model.
-#
-#     ./scripts/run_cv.sh
-#
-# Resumable: a finished fold drops a marker under <work_dir>/logs/cv_<stamp>/.done.
-# Rerun with the same stamp to continue where it stopped:
-#     ./scripts/run_cv.sh 20260101_1200
+# Experiment 1: five-fold subject-wise cross-validation of the main model.
+# Resumable: ./scripts/run_cv.sh <stamp>
 
 set -uo pipefail
 
@@ -26,7 +20,7 @@ if ! python -c "import torch, timm, insightface" 2>/dev/null; then
 fi
 
 if [[ ! -f "$WORK/dast10_table.csv" ]]; then
-    echo "ERROR: table missing — run 'python -m src.data.build_table' first"
+    echo "ERROR: table missing, run 'python -m src.data.build_table' first"
     exit 1
 fi
 
@@ -57,7 +51,7 @@ for fold in $(seq 0 $((N_FOLDS - 1))); do
         touch "$marker"
         echo "  [ok]   fold $fold  ($(( (SECONDS-t0)/60 )) min)"
     else
-        echo "  [FAIL] fold $fold  ($(( (SECONDS-t0)/60 )) min) — see $log"
+        echo "  [FAIL] fold $fold  ($(( (SECONDS-t0)/60 )) min), see $log"
         tail -n 15 "$log" | sed 's/^/      | /'
     fi
 done

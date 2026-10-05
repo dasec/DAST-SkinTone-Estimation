@@ -1,11 +1,4 @@
-"""Pool the cross-validation folds into the headline numbers.
-
-Reports both the pooled metric over every held-out image (each subject appears
-exactly once, so this is the figure to quote) and the per-fold mean, std, min
-and max, whose spread is what a single split cannot show.
-
-    python -m src.eval.collect_cv
-"""
+"""Pool the cross-validation folds into the headline numbers."""
 
 import argparse
 import sys
@@ -37,7 +30,7 @@ def main():
 
     files = sorted(cv_dir.glob("fold*_test_predictions.csv"))
     if not files:
-        sys.exit(f"no fold predictions in {cv_dir} — run src.train_cv first")
+        sys.exit(f"no fold predictions in {cv_dir}, run src.train_cv first")
 
     folds = [pd.read_csv(f, dtype={"subject_key": str}) for f in files]
     d = pd.concat(folds, ignore_index=True)

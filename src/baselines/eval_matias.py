@@ -1,12 +1,4 @@
-"""External ViT-S/16 baseline (Matias et al.), evaluated zero-shot.
-
-The released checkpoint has no classification head, so class prototypes are
-rebuilt by embedding the authors' own training images (384 -> 2048 -> 128
-projection), averaging per class and L2-normalising; prediction is the nearest
-prototype by cosine similarity.
-
-    python -m src.baselines.eval_matias --cv
-"""
+"""External ViT-S/16 baseline (Matias et al.), evaluated zero-shot."""
 
 import argparse
 import os
@@ -118,6 +110,8 @@ class ImageDataset(Dataset):
 
 
 def build_prototypes(model, proto_dir):
+    # The released checkpoint has no classification head: prediction is the
+    # nearest class prototype, the L2-normalised mean embedding per class.
     print("Building class prototypes from the baseline authors' training images...")
     ds = ProtoDataset(proto_dir)
     if len(ds) == 0:
@@ -139,7 +133,7 @@ def build_prototypes(model, proto_dir):
                 print(f"  {(i + 1) * args.batch} / {len(ds)}", flush=True)
     if (counts == 0).any():
         empty = [i + 1 for i, c in enumerate(counts) if c == 0]
-        print(f"  [WARN] no images for class(es) {empty} — those prototypes are undefined")
+        print(f"  [WARN] no images for class(es) {empty}, those prototypes are undefined")
     protos = F.normalize(sums / counts.clamp(min=1).unsqueeze(1), dim=1)
     print(f"Done. images per class: {counts.int().tolist()}\n")
     return protos.to(DEVICE), counts

@@ -1,10 +1,4 @@
-"""Occlusion sensitivity pooled over the cross-validation folds.
-
-Each fold model is run on its own held-out subjects, so every subject is
-measured exactly once by a model that never saw it.
-
-    python -m src.interpret.region_sensitivity_cv
-"""
+"""Occlusion sensitivity pooled over the cross-validation folds."""
 
 import argparse
 import sys

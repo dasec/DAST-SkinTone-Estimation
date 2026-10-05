@@ -1,7 +1,4 @@
-"""Merge the primary table with the CHROMA-FIT rows for the cross-dataset experiments.
-
-    python -m src.transfer.build_merged_table
-"""
+"""Merge the primary table with the CHROMA-FIT rows for the cross-dataset experiments."""
 
 import argparse
 import sys
@@ -19,9 +16,9 @@ def main():
     paths = load_paths(args.paths)
 
     if not paths.table_csv.is_file():
-        sys.exit(f"Missing {paths.table_csv} — run src.data.build_table first.")
+        sys.exit(f"Missing {paths.table_csv}, run src.data.build_table first.")
     if not paths.chroma_table.is_file():
-        sys.exit(f"Missing {paths.chroma_table} — needed for the CHROMA-FIT rows.")
+        sys.exit(f"Missing {paths.chroma_table}, needed for the CHROMA-FIT rows.")
 
     dast = pd.read_csv(paths.table_csv, dtype={"subject_key": str})
     dast["dataset"] = "dast"
@@ -45,7 +42,7 @@ def main():
 
     for col in ["UnifiedQualityScore.scalar", "BackgroundUniformity.scalar"]:
         if col not in merged.columns:
-            sys.exit(f"ABORT: '{col}' missing — the quality filter needs it.")
+            sys.exit(f"ABORT: '{col}' missing: the quality filter needs it.")
         n_na = merged[merged.dataset == "chroma"][col].isna().sum()
         if n_na:
             print(f"  [WARN] {n_na} CHROMA-FIT rows have no {col}")
@@ -53,7 +50,7 @@ def main():
     for lab in LABELS:
         if merged[lab].isna().any():
             n = merged[lab].isna().sum()
-            sys.exit(f"ABORT: {n} rows have no {lab} — cannot train on them.")
+            sys.exit(f"ABORT: {n} rows have no {lab}, cannot train on them.")
 
     front = ["complete_path", "dataset", "mst_bin", "subject_key", "triple_key"] + LABELS
     rest = [c for c in merged.columns if c not in front]

@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
-#
 # Experiments 4 and 6: cross-dataset transfer, occlusion sensitivity and
-# EigenCAM, all reusing the fold checkpoints from the main cross-validation run.
-#
-#     ./scripts/run_cv_transfer.sh
-#
+# EigenCAM, reusing the fold checkpoints of the main cross-validation run.
 # Resumable: ./scripts/run_cv_transfer.sh <stamp>
 
 set -uo pipefail
@@ -17,7 +13,7 @@ LOGDIR="$WORK/logs/transfer_$STAMP"
 DONE="$LOGDIR/.done"
 mkdir -p "$LOGDIR" "$DONE"
 
-# Refuse to run rather than silently retraining with a different seed.
+# The fold checkpoints must exist: retraining here would use another seed.
 missing=0
 for f in 0 1 2 3 4; do
     ck="$WORK/checkpoints/cv/cv${f}_vit_small_patch16_224_aligned_best.pth"
@@ -55,7 +51,7 @@ step() {
         touch "$marker"
         echo "  [ok]   $name  ($(( (SECONDS-t0)/60 )) min)"
     else
-        echo "  [FAIL] $name  ($(( (SECONDS-t0)/60 )) min) — see $log"
+        echo "  [FAIL] $name  ($(( (SECONDS-t0)/60 )) min), see $log"
         tail -n 15 "$log" | sed 's/^/      | /'
     fi
 }
@@ -63,17 +59,17 @@ step() {
 echo "stamp : $STAMP"
 echo "logs  : $LOGDIR"
 
-banner "PART 1 of 3 — zero-shot transfer and interpretability"
+banner "PART 1 of 3: zero-shot transfer and interpretability"
 step zeroshot_chroma_cv    python -m src.transfer.eval_zeroshot_chroma_cv
 step region_sensitivity_cv python -m src.interpret.region_sensitivity_cv
 step eigencam_cv           python -m src.interpret.eigencam_cv --fold 0 --subjects 3
 
-banner "PART 2 of 3 — combined training, five folds"
+banner "PART 2 of 3: combined training, five folds"
 for f in 0 1 2 3 4; do
     step "crossdataset_cv_fold$f" python -m src.transfer.train_crossdataset_cv --fold "$f"
 done
 
-banner "PART 3 of 3 — report"
+banner "PART 3 of 3: report"
 step transfer_report       python -m src.transfer.collect_transfer_interp
 
 banner "DONE"

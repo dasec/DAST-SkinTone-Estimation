@@ -1,12 +1,4 @@
-"""Pool the cross-validated backbone ablation into one table.
-
-Each cell is a backbone with or without alignment, pooled over its five folds.
-The ViT-S/16 aligned cell is the main cross-validation run itself, not a
-retrain. Cells with fewer than five folds are marked PARTIAL rather than
-silently averaged.
-
-    python -m src.eval.collect_cv_ablation
-"""
+"""Pool the cross-validated backbone ablation into one table."""
 
 import argparse
 import re

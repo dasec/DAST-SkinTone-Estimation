@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
-#
-# Experiment 5, external baseline: zero-shot and fine-tuned under the same
-# cross-validation protocol as everything else.
-#
-#     ./scripts/run_matias_cv.sh
-#
-# Zero-shot needs no training, so scoring the cross-validated image set once is
-# already the CV-equivalent number. Fine-tuning needs all five folds.
-#
+# Experiment 5, external baseline: zero-shot and fine-tuned on the folds of
+# the main cross-validation. Zero-shot needs no training, so the scored image
+# set is evaluated once; fine-tuning runs all five folds.
 # Resumable: ./scripts/run_matias_cv.sh <stamp>
 
 set -uo pipefail
@@ -38,7 +32,7 @@ step() {
         touch "$marker"
         echo "  [ok]   $name  ($(( (SECONDS-t0)/60 )) min)"
     else
-        echo "  [FAIL] $name — see $log"
+        echo "  [FAIL] $name, see $log"
         tail -n 15 "$log" | sed 's/^/      | /'
     fi
 }
