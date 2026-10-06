@@ -7,8 +7,8 @@
 Code and models of the paper "Skin Tone Estimation for Performance Differential
 Analysis in Biometric Systems", presented at BIOSIG 2026.
 
-<!-- TODO: replace with the link to the published paper. -->
-Paper: [link to be added](TODO)
+Paper: [link to the paper]
+
 
 ## Overview
 
@@ -41,7 +41,7 @@ On a machine without an NVIDIA GPU, replace `onnxruntime-gpu` with `onnxruntime`
 in `requirements.yaml`.
 
 <!-- TODO: replace with the h-da cloud link. -->
-Download the weights from the [h-da cloud](TODO) into `models/`.
+Download the weights from the [h-da cloud insert the link](TODO) into `models/`.
 
 ## Usage
 
@@ -144,6 +144,7 @@ code only, not any dataset.
 ## Citation
 
 ```bibtex
+still not published but it will look something like this
 @inproceedings{Saladino-SkinToneEstimation-BIOSIG-2026,
   Author    = {L. Saladino and A. D{\"o}rsch and F. Stockhardt and C. Busch},
   Booktitle = {Proc. Intl. Conf. of the Biometrics Special Interest Group ({BIOSIG})},
