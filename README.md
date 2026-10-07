@@ -2,6 +2,11 @@
 
 **Authors:** Luca Saladino, André Dörsch, Fabian Stockhardt, Christoph Busch
 
+![Overview](figures/sample_figure.png)
+
+*One DAST-10 subject at five exposure levels: the model predicts nearly the same L\* for every image, close to the colorimeter reading of 54.5.*
+
+
 ## BIOSIG 2026
 
 Code and models of the paper "Skin Tone Estimation for Performance Differential
