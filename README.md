@@ -39,7 +39,7 @@ conda activate skintone
 On a machine without an NVIDIA GPU, replace `onnxruntime-gpu` with `onnxruntime`
 in `requirements.yaml`.
 
-Download the five '.pth' files from the [h-da cloud](https://cloud.h-da.de/s/HRgifQRego9RpSi) (password: 'vV9pkMEGuqEeCOl') and place them in `models/`.
+Download the five `.pth` files from the [h-da cloud](https://cloud.h-da.de/s/HRgifQRego9RpSi) (password: `vV9pkMEGuqEeCOl`) and place them in `models/`.
 
 ## Usage
 
