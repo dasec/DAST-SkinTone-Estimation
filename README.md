@@ -7,7 +7,7 @@
 Code and models of the paper "Skin Tone Estimation for Performance Differential
 Analysis in Biometric Systems", presented at BIOSIG 2026.
 
-Paper: [link to the paper]
+Paper: to appear in the BIOSIG 2026 proceedings.
 
 
 ## Overview
@@ -39,15 +39,14 @@ conda activate skintone
 On a machine without an NVIDIA GPU, replace `onnxruntime-gpu` with `onnxruntime`
 in `requirements.yaml`.
 
-Download the five .pth from the [h-da cloud](https://cloud.h-da.de/s/HRgifQRego9RpSi) (password: vV9pkMEGuqEeCOl) and place them in `models/`.
+Download the five '.pth' files from the [h-da cloud](https://cloud.h-da.de/s/HRgifQRego9RpSi) (password: 'vV9pkMEGuqEeCOl') and place them in `models/`.
 
 ## Usage
 
 One model:
 
 ```bash
-python src/inference.py --model models/skintone_vits16_fold3.pth \
-    --input demo_data --output predictions.csv
+python src/inference.py --model models/skintone_vits16_fold3.pth --input demo_data --output predictions.csv
 ```
 
 ```
@@ -68,8 +67,7 @@ can differ by about 0.01 between machines.
 All five models, with their predictions averaged:
 
 ```bash
-python src/inference.py --model "models/skintone_vits16_fold*.pth" \
-    --input demo_data --output predictions.csv
+python src/inference.py --model "models/skintone_vits16_fold*.pth" --input demo_data --output predictions.csv
 ```
 
 The other four models were trained on subject 001, so this second output is not
@@ -141,10 +139,11 @@ code only, not any dataset.
 
 ## Citation
 
+The paper will appear in the BIOSIG 2026 proceedings; pages and DOI will be added after publication.
+
 ```bibtex
-still not published 
 @inproceedings{Saladino-SkinToneEstimation-BIOSIG-2026,
-  Author    = {L. Saladino and A. Dörsch and F. Stockhardt and C. Busch},
+  Author    = {L. Saladino and A. D{\"o}rsch and F. Stockhardt and C. Busch},
   Booktitle = {25th International Conference of the Biometrics Special Interest Group ({BIOSIG} 2026)},
   Title     = {Skin Tone Estimation for Performance Differential Analysis in Biometric Systems},
   Publisher = {IEEE},
