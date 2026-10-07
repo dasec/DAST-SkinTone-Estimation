@@ -29,10 +29,9 @@ centroid in full CIELAB.
 
 ## Setup
 
-<!-- TODO: replace with the final repository URL under github.com/dasec. -->
 ```bash
-git clone https://github.com/dasec/TODO-repository-name.git
-cd TODO-repository-name
+git clone https://github.com/dasec/DAST-SkinTone-Estimation.git
+cd DAST-SkinTone-Estimation
 conda env create -f requirements.yaml
 conda activate skintone
 ```
@@ -40,8 +39,7 @@ conda activate skintone
 On a machine without an NVIDIA GPU, replace `onnxruntime-gpu` with `onnxruntime`
 in `requirements.yaml`.
 
-<!-- TODO: replace with the h-da cloud link. -->
-Download the weights from the [h-da cloud insert the link](TODO) into `models/`.
+Download the five .pth from the [h-da cloud](https://cloud.h-da.de/s/HRgifQRego9RpSi) (password: vV9pkMEGuqEeCOl) and place them in `models/`.
 
 ## Usage
 
@@ -144,10 +142,10 @@ code only, not any dataset.
 ## Citation
 
 ```bibtex
-still not published but it will look something like this
+still not published 
 @inproceedings{Saladino-SkinToneEstimation-BIOSIG-2026,
-  Author    = {L. Saladino and A. D{\"o}rsch and F. Stockhardt and C. Busch},
-  Booktitle = {Proc. Intl. Conf. of the Biometrics Special Interest Group ({BIOSIG})},
+  Author    = {L. Saladino and A. Dörsch and F. Stockhardt and C. Busch},
+  Booktitle = {25th International Conference of the Biometrics Special Interest Group ({BIOSIG} 2026)},
   Title     = {Skin Tone Estimation for Performance Differential Analysis in Biometric Systems},
   Publisher = {IEEE},
   Year      = {2026}
